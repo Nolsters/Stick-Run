@@ -2,9 +2,9 @@ import pygame
 import random
 
 pygame.init()
-WIDTH = 1920
-HEIGHT = 1080
-win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+WIDTH = 1000
+HEIGHT = 500
+win = pygame.display.set_mode((1000, 750), pygame.FULLSCREEN)
 
 pygame.display.set_caption("Super Mad Man")
 
@@ -24,13 +24,13 @@ myfont = pygame.font.SysFont("comicsans", 45)
 
 clock = pygame.time.Clock()
 
-class player(object):
+class player(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
+        pygame.sprite.Sprite.__init__(self)
         self.x = x
         self.y = y
         self.width = width
         self.height = height
-        self.hitbox = (self.x + 200, self.y, 29, 52)
         self.vel = 10
         self.isJump = False
         self.left = False
@@ -40,6 +40,9 @@ class player(object):
         self.jumpCount = 10
         self.duckCount = 10
         self.health = 100
+        self.rect.x = x
+        self.rect.y = y
+        self.rect = pygame.Rect(self.x + 200, self.y, 29, 52)
 
     def draw(self, win):
         if self.walkCount + 1 >= 10:
@@ -55,8 +58,6 @@ class player(object):
             win.blit(crouch, (self.x, self.y))
         else:
             win.blit(char, (self.x, self.y))
-        self.hitbox = (self.x + 17, self.y + 11, 164, 184)
-        pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
@@ -87,24 +88,27 @@ man = player(200, 410, 64, 64)
 score = 0
 all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
+player = pygame.sprite.Group()
 rungame = False
 for i in range(20):
     m = Mob()
     all_sprites.add(m)
     mobs.add(m)
+player.add(man)
+def game_menu():
+    run = True
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        win.blit(bg2, (200, 410))
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE]:
+            return
 
-run = True
-while run:
-    clock.tick(35)
-    rungame = False
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            run = False
-    win.blit(bg2, (200, 410))
-    keys = pygame.key.get_pressed()
-
-    if keys[pygame.K_SPACE]:
-        rungame = True
+def play_game():
+    rungame = True
+    score = 0
     while rungame:
         clock.tick(35)
         for event in pygame.event.get():
@@ -156,11 +160,20 @@ while run:
             else:
                 man.isJump = False
                 man.jumpCount = 10
+        if pygame.sprite.groupcollide(player, mobs, 1, 0):
+            man.health -= 20
         win.blit(bg, (0, 0))
         all_sprites.update()
         all_sprites.draw(win)
-        scoretext = myfont.render("Score {0}".format(score), 1, (0,0,0))
+        health = man.health
+        scoretext = myfont.render("Score {0}".format(score), 1, (0, 0, 0))
+        life = myfont.render("Life {0}".format(health), 1, (0,0,0))
         win.blit(scoretext, (5, 10))
+        win.blit(life, (10, 100))
         score += 1
         redrawGameWindow()
+
+game_menu()
+play_game()
+
 pygame.quit()
