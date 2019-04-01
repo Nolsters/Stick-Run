@@ -1,7 +1,9 @@
 import pygame
+import random
 
 pygame.init()
-
+WIDTH = 1920
+HEIGHT = 1080
 win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 
 pygame.display.set_caption("Super Mad Man")
@@ -15,14 +17,14 @@ bg2 = pygame.image.load('start.png')
 GREEN = (0, 128, 0)
 WHITE = (255, 255, 255)
 black = (0,0,0)
-myfont = pygame.font.SysFont("monospace", 16)
+RED = (255, 0, 0)
+myfont = pygame.font.SysFont("comicsans", 45)
 
 
 
 clock = pygame.time.Clock()
 
 class player(object):
-
     def __init__(self, x, y, width, height):
         self.x = x
         self.y = y
@@ -56,6 +58,22 @@ class player(object):
         self.hitbox = (self.x + 17, self.y + 11, 164, 184)
         pygame.draw.rect(win, (255, 0, 0), self.hitbox, 2)
 
+class Mob(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((30, 40))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(WIDTH - self.rect.width)
+        self.rect.y = random.randrange(-100, -40)
+        self.speedy = random.randrange(1, 8)
+
+    def update(self):
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10:
+            self.rect.x = random.randrange(WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 8)
 
 
 def redrawGameWindow():
@@ -66,9 +84,14 @@ def redrawGameWindow():
 # mainloop
 man = player(200, 410, 64, 64)
 
-
 score = 0
+all_sprites = pygame.sprite.Group()
+mobs = pygame.sprite.Group()
 rungame = False
+for i in range(20):
+    m = Mob()
+    all_sprites.add(m)
+    mobs.add(m)
 
 run = True
 while run:
@@ -134,9 +157,8 @@ while run:
                 man.isJump = False
                 man.jumpCount = 10
         win.blit(bg, (0, 0))
-        disclaimertext = myfont.render("Some disclaimer...", 1, (0,0,0))
-        win.blit(disclaimertext, (5, 480))
-
+        all_sprites.update()
+        all_sprites.draw(win)
         scoretext = myfont.render("Score {0}".format(score), 1, (0,0,0))
         win.blit(scoretext, (5, 10))
         score += 1
