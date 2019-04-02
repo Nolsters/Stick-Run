@@ -2,9 +2,9 @@ import pygame
 import random
 
 pygame.init()
-WIDTH = 1000
-HEIGHT = 500
-win = pygame.display.set_mode((1000, 750), pygame.FULLSCREEN)
+WIDTH = 1920
+HEIGHT = 1080
+win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
 
 pygame.display.set_caption("Super Mad Man")
 
@@ -14,6 +14,8 @@ char = pygame.image.load('Facing.png')
 crouch = pygame.image.load('Crouch.png')
 bg = pygame.image.load('BG.jpg')
 bg2 = pygame.image.load('start.png')
+bg3 = pygame.image.load('bg3.jpg')
+hitbox = pygame.image.load('hitbox.png')
 GREEN = (0, 128, 0)
 WHITE = (255, 255, 255)
 black = (0,0,0)
@@ -40,9 +42,12 @@ class player(pygame.sprite.Sprite):
         self.jumpCount = 10
         self.duckCount = 10
         self.health = 100
+        self.image = hitbox
+        self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
-        self.rect = pygame.Rect(self.x + 200, self.y, 29, 52)
+
+
 
     def draw(self, win):
         if self.walkCount + 1 >= 10:
@@ -58,6 +63,7 @@ class player(pygame.sprite.Sprite):
             win.blit(crouch, (self.x, self.y))
         else:
             win.blit(char, (self.x, self.y))
+
 
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
@@ -90,21 +96,25 @@ all_sprites = pygame.sprite.Group()
 mobs = pygame.sprite.Group()
 player = pygame.sprite.Group()
 rungame = False
-for i in range(20):
+
+for i in range(28):
     m = Mob()
     all_sprites.add(m)
     mobs.add(m)
+all_sprites.add(man)
 player.add(man)
+
 def game_menu():
-    run = True
-    while run:
+    run2 = True
+    while run2:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
-        win.blit(bg2, (200, 410))
+                run2 = False
+        win.blit(bg2, (900, 550))
         keys = pygame.key.get_pressed()
         if keys[pygame.K_SPACE]:
-            return
+            game_end()
+        pygame.display.update()
 
 def play_game():
     rungame = True
@@ -113,24 +123,28 @@ def play_game():
         clock.tick(35)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run = False
+                rungame = False
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] and man.x > man.vel:
             if man.isDuck:
                 man.x -= man.vel - 5
+                man.rect.x -= man.vel -5
                 man.left = True
                 man.right = False
             else:
                 man.x -= man.vel
+                man.rect.x -= man.vel
                 man.left = True
                 man.right = False
         elif keys[pygame.K_RIGHT] and man.x < 1920 - man.width - man.vel:
             if man.isDuck:
                 man.x += man.vel - 5
+                man.rect.x += man.vel - 5
                 man.right = True
                 man.left = False
             else:
                 man.x += man.vel
+                man.rect.x += man.vel
                 man.right = True
                 man.left = False
         if not (man.isDuck):
@@ -155,12 +169,14 @@ def play_game():
                 neg = 1
                 if man.jumpCount < 0:
                     neg = -1
+                (man.jumpCount ** 2) * 0.5 * neg
                 man.y -= (man.jumpCount ** 2) * 0.5 * neg
+                man.rect.y = man.y
                 man.jumpCount -= 1
             else:
                 man.isJump = False
                 man.jumpCount = 10
-        if pygame.sprite.groupcollide(player, mobs, 1, 0):
+        if pygame.sprite.groupcollide(player, mobs, 0, 1):
             man.health -= 20
         win.blit(bg, (0, 0))
         all_sprites.update()
@@ -172,8 +188,41 @@ def play_game():
         win.blit(life, (10, 100))
         score += 1
         redrawGameWindow()
+        if man.health <= 0:
+            return score
+    return score
+
+def game_highscores():
+    run2 = True
+    while run2:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run2 = False
+        win.blit(bg3, (0, 0))
+        pygame.display.update()
+
+
+def game_end():
+    run = True
+    score = play_game()
+    while run:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        final_score = myfont.render("You Scored {0}".format(score), 1, (0, 0, 0))
+        navigate = myfont.render("press H for highscores!", 1, (0,0,0))
+        win.blit(bg, (0, 0))
+        win.blit(final_score, (900, 400))
+        win.blit(navigate, (900, 550))
+        redrawGameWindow()
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_h]:
+            game_highscores()
+
+
+
 
 game_menu()
-play_game()
+
 
 pygame.quit()
