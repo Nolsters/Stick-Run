@@ -1,12 +1,16 @@
 import pygame
 import random
 
+
+'''
+Pls Set width and height to 1920x1080 for the best resolution if this is not possible set it to your native resolution.
+'''
 pygame.init()
 WIDTH = 750
 HEIGHT = 550
-win = pygame.display.set_mode((750, 550), pygame.FULLSCREEN)
+win = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN)  # Sets window.
 
-pygame.display.set_caption("Super Mad Man")
+pygame.display.set_caption("Super Mad Man")  # Windows name
 
 
 '''
@@ -52,7 +56,7 @@ class player(pygame.sprite.Sprite):
         self.height = height
         self.vel = 10
         self.isJump = False
-        self.left = False
+        self.left = False       # Sets all positions to FALSE
         self.right = False
         self.isDuck = False
         self.walkCount = 0
@@ -71,15 +75,15 @@ class player(pygame.sprite.Sprite):
             self.walkCount = 0
 
         if self.left:
-            win.blit(walkLeft[self.walkCount // 3], (self.x, self.y))
+            win.blit(walkLeft[self.walkCount // 3], (self.x, self.y))       # Runs through the 3 walk left animations.
             self.walkCount += 1
         elif self.right:
-            win.blit(walkRight[self.walkCount // 3], (self.x, self.y))
+            win.blit(walkRight[self.walkCount // 3], (self.x, self.y))      # Runs through the 3 walk right animations.\
             self.walkCount += 1
         elif self.isDuck:
-            win.blit(crouch, (self.x, self.y))
+            win.blit(crouch, (self.x, self.y))      # Displays crouch animation with the x and y position.
         else:
-            win.blit(char, (self.x, self.y))
+            win.blit(char, (self.x, self.y))        # Displays Standing animation with x and y pos.
 
 '''
 The mob class is the rain or red stuff falling.
@@ -225,12 +229,12 @@ def play_game():
         all_sprites.update()
         all_sprites.draw(win)
         health = man.health
-        scoretext = myfont.render("Score {0}".format(score), 1, (0, 0, 0))
-        life = myfont.render("Life {0}".format(health), 1, (0,0,0))
-        win.blit(scoretext, (5, 10))
-        win.blit(life, (10, 100))
-        score += 1
-        redrawGameWindow()
+        scoretext = myfont.render("Score {0}".format(score), 1, (0, 0, 0))  # Sets up the current score.
+        life = myfont.render("Life {0}".format(health), 1, (0,0,0))     # Sets up the current life score.
+        win.blit(scoretext, (5, 10))    # Renders the score on screen.
+        win.blit(life, (10, 100))   # Renders the life points.
+        score += 1      # Adds 1 to the score.
+        redrawGameWindow()  # Updates / redraws game window.
         if man.health <= 0:  # Checks if the players health is below or equal to 0
             return score    # Returns Score
     return score            # Returns Score
@@ -243,22 +247,23 @@ This displays your score and the current highscore. And tells user to hit h to r
 
 '''
 def game_end():
-    run = True
-    score = play_game()
-    while run:
+    run = True  # Sets run to True
+    score = play_game()  # Sets score to play_game() then runs play_game() to get the score.
+    while run:  # Runs game loop.
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
         final_score = myfont.render("You Scored {0}".format(score), 1, (0, 0, 0))
-        navigate = myfont.render("press space to start again!", 1, (0,0,0))
-        win.blit(bg, (0, 0))
-        win.blit(final_score, (900, 400))
-        win.blit(navigate, (900, 550))
-        redrawGameWindow()
+        navigate = myfont.render("press space to start again! or  E to exit.", 1, (0,0,0))         # Sets up score and other text.
+        win.blit(bg, (0, 0))     # Renders Background
+        win.blit(final_score, (900, 400))   # Renders Final Score.
+        win.blit(navigate, (900, 550))      # Renders navigate text.
+        redrawGameWindow()                  # Updates window.
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_h]:
-            play_game()
-
+        if keys[pygame.K_SPACE]:    # On h press plays game again.
+            play_game()    # Runs play_game()
+        if keys[pygame.K_e]:
+            pygame.quit()
 
 
 
