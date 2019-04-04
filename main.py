@@ -2,35 +2,52 @@ import pygame
 import random
 
 pygame.init()
-WIDTH = 1920
-HEIGHT = 1080
-win = pygame.display.set_mode((1920, 1080), pygame.FULLSCREEN)
+WIDTH = 750
+HEIGHT = 550
+win = pygame.display.set_mode((750, 550), pygame.FULLSCREEN)
 
 pygame.display.set_caption("Super Mad Man")
 
-walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png')]
-walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png')]
-char = pygame.image.load('Facing.png')
-crouch = pygame.image.load('Crouch.png')
-bg = pygame.image.load('BG.jpg')
-bg2 = pygame.image.load('start.png')
-bg3 = pygame.image.load('bg3.jpg')
-hitbox = pygame.image.load('hitbox.png')
-GREEN = (0, 128, 0)
-WHITE = (255, 255, 255)
-black = (0,0,0)
-RED = (255, 0, 0)
-myfont = pygame.font.SysFont("comicsans", 45)
+
+'''
+Setting up global variables.
+I use these for images when setting up the game.
+In the future I would like to keep these in a separate document then import that document.
+'''
+walkRight = [pygame.image.load('R1.png'), pygame.image.load('R2.png'), pygame.image.load('R3.png')] # Walking Animation
+walkLeft = [pygame.image.load('L1.png'), pygame.image.load('L2.png'), pygame.image.load('L3.png')] # More Walking animmation
+char = pygame.image.load('Facing.png')  # Facing you animation
+crouch = pygame.image.load('Crouch.png')  # Crouching animation
+bg = pygame.image.load('BG.jpg')  # Background 1
+bg2 = pygame.image.load('start.png')  # Background 2 (Starting Background)
+bg3 = pygame.image.load('bg3.jpg')  # Background image 3 (Not in use)
+hitbox = pygame.image.load('hitbox.png') # Hit box image.
+GREEN = (0, 128, 0)  # Green RGB
+WHITE = (255, 255, 255)  # White RGB
+black = (0,0,0)  # Black RGB
+RED = (255, 0, 0)  # Red RBG
+myfont = pygame.font.SysFont("comicsans", 45)  # Font Setup
 
 
 
-clock = pygame.time.Clock()
+clock = pygame.time.Clock()  # Setting up pygame time.
 
+
+
+'''
+Player class
+This sets an x, y, width and height position.
+We then set those values including rect positions as well.
+Also an is jup lef right and is duck variable these track the users positions.
+Then in the draw method we take in the win which is the window.
+In the draw method it setups animations including switching from the 3 animations per motion and jumping and crouching
+tracking. As well draw makes sure to draw player.
+'''
 class player(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height):
-        pygame.sprite.Sprite.__init__(self)
+        pygame.sprite.Sprite.__init__(self)     # taking in the pygame.sprite class.
         self.x = x
-        self.y = y
+        self.y = y             # Sets x y and width and height of player.
         self.width = width
         self.height = height
         self.vel = 10
@@ -41,11 +58,11 @@ class player(pygame.sprite.Sprite):
         self.walkCount = 0
         self.jumpCount = 10
         self.duckCount = 10
-        self.health = 100
-        self.image = hitbox
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = y
+        self.health = 100   # Sets Health
+        self.image = hitbox # Sets image to hitbox.
+        self.rect = self.image.get_rect()   # Gets rect of the image.
+        self.rect.x = x    # Sets x for rect
+        self.rect.y = y    # Sets y for rect
 
 
 
@@ -64,61 +81,83 @@ class player(pygame.sprite.Sprite):
         else:
             win.blit(char, (self.x, self.y))
 
-
+'''
+The mob class is the rain or red stuff falling.
+It has much of the same code as the player the only diference is the speed and rect x and y positions.
+The rect x and y are random and as well the speed is random from 1 to 8.
+'''
 class Mob(pygame.sprite.Sprite):
     def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill(RED)
-        self.rect = self.image.get_rect()
-        self.rect.x = random.randrange(WIDTH - self.rect.width)
+        pygame.sprite.Sprite.__init__(self)    # taking in pygame.sprite class.
+        self.image = pygame.Surface((30, 40))   # Sets image size.
+        self.image.fill(RED)                   # Fills image red.
+        self.rect = self.image.get_rect()       # Sets image to rect.
+        self.rect.x = random.randrange(WIDTH - self.rect.width)     # Sets rect x and rect y.
         self.rect.y = random.randrange(-100, -40)
         self.speedy = random.randrange(1, 8)
 
-    def update(self):
-        self.rect.y += self.speedy
-        if self.rect.top > HEIGHT + 10:
+    def update(self):      # Deals with the position of the rect or the image.
+        self.rect.y += self.speedy  # Adds the speed to the rect y.
+        if self.rect.top > HEIGHT + 10:     # If self.rect.top is greter than the height + 10 then updates image speeds.
             self.rect.x = random.randrange(WIDTH - self.rect.width)
             self.rect.y = random.randrange(-100, -40)
             self.speedy = random.randrange(1, 8)
 
 
+
+
+
+
+'''
+Simple draw game function.
+'''
+
 def redrawGameWindow():
-    man.draw(win)
-    pygame.display.update()
+    man.draw(win)  # Draws Player.
+    pygame.display.update()  # Updates display.
 
 
-# mainloop
+# Giving our player some details.
 man = player(200, 410, 64, 64)
 
-score = 0
-all_sprites = pygame.sprite.Group()
-mobs = pygame.sprite.Group()
-player = pygame.sprite.Group()
-rungame = False
+all_sprites = pygame.sprite.Group()  # Sets all_sprites to a group.
+mobs = pygame.sprite.Group()  # Sets mobs to a group.
+player = pygame.sprite.Group()  # Sets player to a grup.
+rungame = False  # Sets rungame to False
 
 for i in range(28):
     m = Mob()
-    all_sprites.add(m)
+    all_sprites.add(m)      # Creates and adds a mob to the list of mobs. (28)
     mobs.add(m)
-all_sprites.add(man)
-player.add(man)
+all_sprites.add(man)    # Add man player to all sprites.
+player.add(man)         # Adds man to player group.
 
+
+'''
+Game Menu.
+Just the beginning allowing the user to start the game by clicking space.
+'''
 def game_menu():
-    run2 = True
-    while run2:
+    run = True
+    while run:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                run2 = False
-        win.blit(bg2, (900, 550))
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_SPACE]:
-            game_end()
-        pygame.display.update()
+                run = False
+        win.blit(bg2, (900, 550))   # Displays Background 2.
+        keys = pygame.key.get_pressed()  # Sets keys.
+        if keys[pygame.K_SPACE]:  # If user presses space
+            game_end()  # Run game_end()
+        pygame.display.update()  # Updates display.
 
+
+'''
+Main game loop.
+This loop contains a lot of functions. It spawns all 
+'''
 def play_game():
     rungame = True
     score = 0
+    man.health = 100
     while rungame:
         clock.tick(35)
         for event in pygame.event.get():
@@ -178,6 +217,10 @@ def play_game():
                 man.jumpCount = 10
         if pygame.sprite.groupcollide(player, mobs, 0, 1):
             man.health -= 20
+
+        '''
+        Updates Screen with score, life points, and all_sprites.
+        '''
         win.blit(bg, (0, 0))
         all_sprites.update()
         all_sprites.draw(win)
@@ -188,20 +231,17 @@ def play_game():
         win.blit(life, (10, 100))
         score += 1
         redrawGameWindow()
-        if man.health <= 0:
-            return score
-    return score
-
-def game_highscores():
-    run2 = True
-    while run2:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run2 = False
-        win.blit(bg3, (0, 0))
-        pygame.display.update()
+        if man.health <= 0:  # Checks if the players health is below or equal to 0
+            return score    # Returns Score
+    return score            # Returns Score
 
 
+
+'''
+Game End Function
+This displays your score and the current highscore. And tells user to hit h to restart.
+
+'''
 def game_end():
     run = True
     score = play_game()
@@ -210,19 +250,20 @@ def game_end():
             if event.type == pygame.QUIT:
                 run = False
         final_score = myfont.render("You Scored {0}".format(score), 1, (0, 0, 0))
-        navigate = myfont.render("press H for highscores!", 1, (0,0,0))
+        navigate = myfont.render("press space to start again!", 1, (0,0,0))
         win.blit(bg, (0, 0))
         win.blit(final_score, (900, 400))
         win.blit(navigate, (900, 550))
         redrawGameWindow()
         keys = pygame.key.get_pressed()
         if keys[pygame.K_h]:
-            game_highscores()
+            play_game()
 
 
 
 
+#  Runs Game.
 game_menu()
 
-
+#  Quites game
 pygame.quit()
