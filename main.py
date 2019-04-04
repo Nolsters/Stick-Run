@@ -1,5 +1,5 @@
-import pygame
-import random
+import pygame   # Imports Pygame
+import random   # Imports Random
 
 
 '''
@@ -159,27 +159,27 @@ Main game loop.
 This loop contains a lot of functions. It spawns all 
 '''
 def play_game():
-    rungame = True
-    score = 0
-    man.health = 100
-    while rungame:
+    rungame = True  # Sets rungame to true
+    score = 0   # Sets Score to 0
+    man.health = 100    # Sets health to 100
+    while rungame:  # Runs game loop
         clock.tick(35)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 rungame = False
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT] and man.x > man.vel:
-            if man.isDuck:
-                man.x -= man.vel - 5
-                man.rect.x -= man.vel -5
-                man.left = True
-                man.right = False
-            else:
-                man.x -= man.vel
-                man.rect.x -= man.vel
-                man.left = True
-                man.right = False
-        elif keys[pygame.K_RIGHT] and man.x < 1920 - man.width - man.vel:
+        keys = pygame.key.get_pressed()  # Sets the key variable to allow us to make key presses shorter later on.
+        if keys[pygame.K_LEFT] and man.x > man.vel:  # On left click player will move left if there is room.
+            if man.isDuck:  # Checks if player is duck.
+                man.x -= man.vel - 5    # Moves character 5 units left.
+                man.rect.x -= man.vel -5    # Moves rect 5 units left.
+                man.left = True  # Sets man.left to true so animation will run.
+                man.right = False  # Sets man.right to false.
+            else:  # If player is not duck.
+                man.x -= man.vel    # Player moves 10 left.
+                man.rect.x -= man.vel   # Rect moves 10 left.
+                man.left = True  # Sets left to True
+                man.right = False   # Sets right to false
+        elif keys[pygame.K_RIGHT] and man.x < 1920 - man.width - man.vel:    # The Code below is the same as above but for right.
             if man.isDuck:
                 man.x += man.vel - 5
                 man.rect.x += man.vel - 5
@@ -191,19 +191,19 @@ def play_game():
                 man.right = True
                 man.left = False
         if not (man.isDuck):
-            if keys[pygame.K_DOWN]:
-                man.isDuck = True
+            if keys[pygame.K_DOWN]:     # Checks if down key is pressed.
+                man.isDuck = True       # Sets man is duck to True.
             else:
-                man.isDuck = False
+                man.isDuck = False      # Else set False
         else:
-            man.right = False
+            man.right = False           # Sets all other variables False.
             man.left = False
             man.walkCount = 0
 
         if not (man.isJump):
-            if keys[pygame.K_UP]:
-                man.isJump = True
-                man.right = False
+            if keys[pygame.K_UP]:       # If up key is pressed.
+                man.isJump = True       # Sets man is jump to True.
+                man.right = False       # Sets other variables false.
                 man.left = False
                 man.isDuck = False
                 man.walkCount = 0
@@ -211,7 +211,7 @@ def play_game():
             if man.jumpCount >= -10:
                 neg = 1
                 if man.jumpCount < 0:
-                    neg = -1
+                    neg = -1                            # Gravity caculations to make jumping realistic.
                 (man.jumpCount ** 2) * 0.5 * neg
                 man.y -= (man.jumpCount ** 2) * 0.5 * neg
                 man.rect.y = man.y
@@ -219,6 +219,11 @@ def play_game():
             else:
                 man.isJump = False
                 man.jumpCount = 10
+        '''
+        Using groupcollide it check if a player in the players class rect is overlapping with a mob in the mobs group
+        the 0 and 1 stand for dokill. So the first 0 means it will not kill the player and the second indicates it will
+        kill the mob.
+        '''
         if pygame.sprite.groupcollide(player, mobs, 0, 1):
             man.health -= 20
 
